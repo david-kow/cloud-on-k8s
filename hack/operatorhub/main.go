@@ -104,11 +104,12 @@ func doRun(_ *cobra.Command, _ []string) error {
 }
 
 type config struct {
-	NewVersion   string `json:"newVersion"`
-	PrevVersion  string `json:"prevVersion"`
-	StackVersion string `json:"stackVersion"`
-	OperatorRepo string `json:"operatorRepo"`
-	CRDs         []struct {
+	NewVersion          string `json:"newVersion"`
+	PrevVersion         string `json:"prevVersion"`
+	StackVersion        string `json:"stackVersion"`
+	OperatorRepo        string `json:"operatorRepo"`
+	DistributionChannel string `json:"distributionChannel"`
+	CRDs                []struct {
 		Name        string `json:"name"`
 		DisplayName string `json:"displayName"`
 		Description string `json:"description"`
@@ -236,13 +237,14 @@ func extractYAMLParts(stream io.Reader) (*yamlExtracts, error) {
 }
 
 type RenderParams struct {
-	NewVersion   string
-	ShortVersion string
-	PrevVersion  string
-	StackVersion string
-	OperatorRepo string
-	OperatorRBAC string
-	CRDList      []*CRD
+	NewVersion          string
+	ShortVersion        string
+	PrevVersion         string
+	StackVersion        string
+	OperatorRepo        string
+	OperatorRBAC        string
+	DistributionChannel string
+	CRDList             []*CRD
 }
 
 func buildRenderParams(conf *config, extracts *yamlExtracts) (*RenderParams, error) {
@@ -284,13 +286,14 @@ func buildRenderParams(conf *config, extracts *yamlExtracts) (*RenderParams, err
 	}
 
 	return &RenderParams{
-		NewVersion:   conf.NewVersion,
-		ShortVersion: strings.Join(versionParts[:2], "."),
-		PrevVersion:  conf.PrevVersion,
-		StackVersion: conf.StackVersion,
-		OperatorRepo: conf.OperatorRepo,
-		CRDList:      crdList,
-		OperatorRBAC: string(rbac),
+		NewVersion:          conf.NewVersion,
+		ShortVersion:        strings.Join(versionParts[:2], "."),
+		PrevVersion:         conf.PrevVersion,
+		StackVersion:        conf.StackVersion,
+		OperatorRepo:        conf.OperatorRepo,
+		DistributionChannel: conf.DistributionChannel,
+		CRDList:             crdList,
+		OperatorRBAC:        string(rbac),
 	}, nil
 }
 

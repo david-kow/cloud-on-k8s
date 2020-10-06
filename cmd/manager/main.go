@@ -174,6 +174,11 @@ func Command() *cobra.Command {
 		false,
 		"Disable periodically updating ECK telemetry data for Kibana to consume.",
 	)
+	cmd.Flags().String(
+		operator.DistributionChannelFlag,
+		"",
+		"Set the distribution channel to report through the telemetry.",
+	)
 	cmd.Flags().Bool(
 		operator.EnforceRBACOnRefsFlag,
 		false, // Set to false for backward compatibility
@@ -248,6 +253,9 @@ func Command() *cobra.Command {
 	// hide development mode flags from the usage message
 	_ = cmd.Flags().MarkHidden(operator.AutoPortForwardFlag)
 	_ = cmd.Flags().MarkHidden(operator.DebugHTTPListenFlag)
+
+	// hide flags set by the build process
+	_ = cmd.Flags().MarkHidden(operator.DistributionChannelFlag)
 
 	// configure filename auto-completion for the config flag
 	_ = cmd.MarkFlagFilename(operator.ConfigFlag)
@@ -467,7 +475,8 @@ func startOperator(stopChan <-chan struct{}) error {
 		return err
 	}
 
-	operatorInfo, err := about.GetOperatorInfo(clientset, operatorNamespace)
+	distributionChannel := viper.GetString(operator.DistributionChannelFlag)
+	operatorInfo, err := about.GetOperatorInfo(clientset, operatorNamespace, distributionChannel)
 	if err != nil {
 		log.Error(err, "Failed to get operator info")
 		return err
@@ -536,7 +545,8 @@ func asyncTasks(
 	managedNamespaces []string,
 	operatorNamespace string,
 	operatorInfo about.OperatorInfo,
-	disableTelemetry bool) {
+	disableTelemetry bool,
+) {
 	<-mgr.Elected() // wait for this operator instance to be elected
 
 	// Report this instance as elected through Prometheus

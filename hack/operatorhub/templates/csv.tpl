@@ -195,7 +195,7 @@ spec:
               containers:
               - image: {{ .OperatorRepo }}:{{ .NewVersion }}
                 name: manager
-                args: ["manager", "--config=/conf/eck.yaml"]
+                args: ["manager", "--config=/conf/eck.yaml", "--distributionChannel={{ .DistributionChannel }}"]
                 env:
                 - name: NAMESPACES
                   valueFrom:
